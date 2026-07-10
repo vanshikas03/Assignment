@@ -1,13 +1,50 @@
-import pandas as pd
+import sqlite3
 
-# Load CSV
-df = pd.read_csv("students.csv")
+conn = sqlite3.connect("students.db")
 
-# Filter and sort
-result = (
-    df[df["score"] > 70]
-    .sort_values(by="score", ascending=False)
-)
 
-# Print name and score
-print(result[["name", "score"]])
+def run_query(query):
+    cursor = conn.cursor()
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+def run_query_no_output(query):
+    cursor = conn.cursor()
+    cursor.execute(query)
+    conn.commit()
+
+
+# Create table
+run_query_no_output("""
+CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    course TEXT NOT NULL,
+    score REAL DEFAULT 0.0
+);
+""")
+
+# Insert records
+run_query_no_output("""
+INSERT INTO students (name, course, score)
+VALUES ('Rahul', 'Python', 85);
+""")
+
+run_query_no_output("""
+INSERT INTO students (name, course, score)
+VALUES ('Priya', 'SQL', 92);
+""")
+
+run_query_no_output("""
+INSERT INTO students (name, course, score)
+VALUES ('Aman', 'Data Science', 78);
+""")
+
+# Print all rows
+rows = run_query("SELECT * FROM students;")
+
+for row in rows:
+    print(row)
+
+conn.close()
