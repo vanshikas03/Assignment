@@ -3,21 +3,26 @@ import sqlite3
 
 app = Flask(__name__)
 
+# ----------------------------
+# HOME
+# ----------------------------
 @app.route("/")
 def home():
     return jsonify({
-         "message": "Student Portal API is running successfully!",
-         "students_api": "/students",,
-         "dashboard_api": "/api/dashboard"
+        "message": "Student Portal API is running successfully!",
+        "students_api": "/students",
+        "dashboard_api": "/api/dashboard"
     })
+
+
 # ----------------------------
 # CORS
 # ----------------------------
 @app.after_request
 def add_cors_headers(response):
-    response.headers.add("Access-Control-Allow-Origin", "https://studentportal2026xyz-b6eyebgzfubyhgfn.centralindia-01.azurewebsites.net/students")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-    response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
 
 
@@ -31,6 +36,7 @@ def get_students():
 
     cursor.execute("SELECT * FROM students")
     rows = cursor.fetchall()
+    conn.close()
 
     students = []
 
@@ -42,8 +48,6 @@ def get_students():
             "course": row[3]
         })
 
-    conn.close()
-
     return jsonify(students)
 
 
@@ -52,7 +56,6 @@ def get_students():
 # ----------------------------
 @app.route("/students/<int:id>", methods=["GET"])
 def get_student(id):
-
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
@@ -62,13 +65,12 @@ def get_student(id):
     conn.close()
 
     if row:
-        student = {
+        return jsonify({
             "id": row[0],
             "name": row[1],
             "age": row[2],
             "course": row[3]
-        }
-        return jsonify(student)
+        })
 
     return jsonify({"message": "Student not found"}), 404
 
@@ -78,7 +80,6 @@ def get_student(id):
 # ----------------------------
 @app.route("/students", methods=["POST"])
 def add_student():
-
     data = request.get_json()
 
     conn = sqlite3.connect("students.db")
@@ -106,7 +107,6 @@ def add_student():
 # ----------------------------
 @app.route("/students/<int:id>", methods=["PUT"])
 def update_student(id):
-
     data = request.get_json()
 
     conn = sqlite3.connect("students.db")
@@ -139,7 +139,6 @@ def update_student(id):
 # ----------------------------
 @app.route("/students/<int:id>", methods=["DELETE"])
 def delete_student(id):
-
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
@@ -186,5 +185,4 @@ def get_dashboard():
 # RUN APP
 # ----------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    app.run(host="0.0.0.0", port=8000, debug=True)
