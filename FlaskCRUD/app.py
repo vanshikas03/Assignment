@@ -3,7 +3,11 @@ import sqlite3
 
 app = Flask(__name__)
 
-
+@app.route("/")
+def home():
+    return jsonify({
+         "message": "Student Portal API is running successfully!"
+    })
 # ----------------------------
 # CORS
 # ----------------------------
