@@ -6,7 +6,9 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     return jsonify({
-         "message": "Student Portal API is running successfully!"
+         "message": "Student Portal API is running successfully!",
+         "students_api": "/students",,
+         "dashboard_api": "/api/dashboard"
     })
 # ----------------------------
 # CORS
